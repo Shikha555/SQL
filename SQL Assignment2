@@ -1,0 +1,41 @@
+select * from Zomato1
+select count(*) from zomato1
+--Q1. Create a user-defined functions to stuff the Chicken into‘Quick Bites’.Eg: ‘Quick Chicken Bites’.
+create procedure stuffSChicken
+@type varchar(255),
+@newType varchar(255)
+AS
+update Zomato1 set RestaurantType = @newType from Zomato1 where RestaurantType = @type
+exec stuffSChicken 'Quick Chicken Bites2','Quick Chicken Bites'
+
+create procedure test
+AS 
+update zomato1 set RestaurantType = 'Quick Chicken Bites'from Zomato1 where RestaurantType = 'Quick Bites'
+select * from Zomato1
+
+exec test
+--Q2.Use the function to display the restaurant name and cuisine type which has the maximum number of rating.
+create procedure NoOfRating
+AS
+select top(2) restaurantname,cuisinestype, noofrating, rank() over(order by noofrating desc) as rating from zomato1
+exec NoOfRating
+
+--Q3.Create a RatingStatus column to display the ratingas ‘Excellent’ if it has more the 4 star rating, ‘Good’ if it has above 3.5 and below 4 star rating, ‘Average’ if it is above 3 and below 3.5 and ‘Bad’ if it is below 3 star rating
+select * ,
+case
+when rating >= 4 then 'Excellent'
+when rating >= 3.5 and rating < 4 then 'Good'
+when rating >= 3 and rating < 3.5 then 'Average'
+when rating < 3 then 'Bad'
+end as 'RatingStatus'
+From Zomato1
+
+--Q4.Find the Ceil,floor and absolute values of the rating column and display the current date and separately display the year,month_name and day
+select rating,ceiling(rating) as ceilRating , floor(rating) as FloorRating,abs(rating) as absoluteRating from Zomato1
+select GETDATE()
+select datename(year,getdate())
+select datename(month,getdate())
+select datename(day,getdate())
+
+--Q5.Display the restaurant type and total average cost using rollup
+select RestaurantType,sum(AverageCost) as Total_Avg_Cost from Zomato1 group by RestaurantType
