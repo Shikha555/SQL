@@ -1,0 +1,45 @@
+select * from Zomato1
+--Q1. Create a storedprocedure to display the restaurantname, type and cuisine where the tablebooking is not zero.
+create procedure display
+AS
+select RestaurantName,RestaurantType,CuisinesType from Zomato1
+Where TableBooking = 'Yes'
+exec display
+--Q2. Create a transaction and update the cuisine type ‘Cafe’ to ‘Cafeteria’. Check the result and rollback it.
+begin transaction
+update zomato1 set CuisinesType = 'Cafeteria' where CuisinesType = 'Cafe'
+print 'Transaction commited'
+end
+rollback transaction
+
+--Q3. Generate a rownumber column and find the top 5 areas with the highest rating of restaurants.
+
+select top(5) *,row_number() over (order by noOfRating desc) as rownumber  from zomato1
+
+--Q4. Use the while loop to display the 1 to 50.
+declare @row_num int = 1
+while @row_num <= 50
+begin
+select * from zomato1 where orderId = @row_num
+set @row_num = @row_num+1
+End
+
+--Q5. Write a query to Create a Top rating view to store the generated top 5 highest rating of restaurants.
+create view top_5
+AS
+select top(5) *  from zomato1 order by NoOfRating DESC
+
+select * from top_5
+
+--Q6. Write a trigger that sends an email notification to the restaurant owner whenever a new record is inserted.
+CREATE TRIGGER reminder2  
+ON Zomato1  
+AFTER INSERT   
+AS  
+   EXEC msdb.dbo.sp_send_dbmail  
+        @profile_name = 'AdventureWorks2022 Administrator',  
+        @recipients = 'ranishikha555@gmail.com',  
+        @body = 'A record is inserted in your table.',  
+        @subject = 'Record Inserted';  
+GO  
+insert into zomato1(OrderId,RestaurantName,RestaurantType,Rating) values (7105,'Shikha','Chicken',4.1)
